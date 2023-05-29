@@ -164,10 +164,16 @@ public class ButtonEditor extends DefaultCellEditor {
 
                         // Vérifier si c'est une modification ou un ajout
                         if (congeId > 0) {
-                            // Exécuter la logique de modification pour la table "Conge"
-                            Conge conge = new Conge(congeId, motif, nbrJours, (java.sql.Date) dateDemande, (java.sql.Date) dateRetour, numEmp);
-                            conge.update(congeId);
-                            System.out.println("Congé mis à jour avec succès !");
+                            CreateConge dialog = null;
+                            try {
+                                dialog = new CreateConge(congeId, motif, nbrJours, (java.sql.Date) dateDemande, (java.sql.Date) dateRetour, numEmp);
+                            } catch (SQLException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                            dialog.pack();
+                            dialog.setResizable(false);
+                            dialog.setLocationRelativeTo(null);
+                            dialog.setVisible(true);
                         } else {
                             // Ouvrir le dialogue d'ajout d'un nouveau congé
                             CreateConge dialog = null;
@@ -184,8 +190,8 @@ public class ButtonEditor extends DefaultCellEditor {
                     }
                 }
 
-
             }
+
         });
 
         panel.add(deleteButton);

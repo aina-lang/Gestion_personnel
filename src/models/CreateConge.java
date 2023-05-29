@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CreateConge extends JDialog {
-    private final MySQLConnection cnx = new MySQLConnection();
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -25,8 +24,11 @@ public class CreateConge extends JDialog {
     private JTextField anneeRetour;
     private JSpinner nbrJour;
     private Conge conge;
+    private final MySQLConnection cnx = new MySQLConnection();
+    private final int congeId;
 
-    public CreateConge() throws SQLException {
+    public CreateConge(int congeId, String motif, int nbrJours, Date dateDemande, Date dateRetour, int numEmp) throws SQLException {
+        this.congeId = congeId;
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
@@ -58,6 +60,70 @@ public class CreateConge extends JDialog {
                 onCancel();
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        // Utilisez les paramètres pour pré-remplir les champs du formulaire
+        this.jourDemande.setText(Integer.toString(dateDemande.getDay()));
+        this.moisDemande.setText(Integer.toString(dateDemande.getMonth()));
+        this.anneeDemande.setText(Integer.toString(dateDemande.getYear() + 1900));
+        this.motif.setText(motif);
+        this.jourRetour.setText(Integer.toString(dateRetour.getDay()));
+        this.moisRetour.setText(Integer.toString(dateRetour.getMonth()));
+        this.anneeRetour.setText(Integer.toString(dateRetour.getYear() + 1900));
+        this.nbrJour.setValue(nbrJours);
+        this.employe.setSelectedItem(numEmp + " - " + getEmployeName(numEmp));
+    }
+
+    public CreateConge(int congeId) throws SQLException {
+        this.congeId = congeId;
+
+        setContentPane(contentPane);
+        setModal(true);
+        getRootPane().setDefaultButton(buttonOK);
+
+        populateComboBox(employe);
+        buttonOK.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onOK();
+            }
+        });
+
+        buttonCancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onCancel();
+            }
+        });
+
+        // call onCancel() when cross is clicked
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                onCancel();
+            }
+        });
+
+        // call onCancel() on ESCAPE
+        contentPane.registerKeyboardAction(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onCancel();
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    }
+
+    public CreateConge() throws SQLException {
+        this(0);
+    }
+
+    public String getEmployeName(int numEmp) throws SQLException {
+        String query = "SELECT Nom, Prenom FROM EMPLOYE WHERE numEmp = " + numEmp;
+        Statement statement = MySQLConnection.getConnection().createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+
+        if (resultSet.next()) {
+            String nom = resultSet.getString("Nom");
+            String prenom = resultSet.getString("Prenom");
+            return nom + " " + prenom;
+        }
+
+        return "";
     }
 
     private void onOK() {
@@ -97,12 +163,23 @@ public class CreateConge extends JDialog {
         Date dateRetour = new Date(anneeRetour - 1900, moisRetour - 1, jourRetour);
 
         // Créer l'objet Conge
-        conge = new Conge(numEmp, motifText, nbJr, dateDemande, dateRetour);
-
-        try {
-            conge.create(conge);
-        } catch (SQLException | ParseException ex) {
-            throw new RuntimeException(ex);
+        if (congeId > 0) {
+            // Modification du congé existant
+            conge = new Conge(congeId, numEmp, motifText, nbJr, dateDemande, dateRetour);
+            try {
+                conge.update(conge);
+                System.out.println("Congé mis à jour avec succès !");
+            } catch (SQLException | ParseException ex) {
+                throw new RuntimeException(ex);
+            }
+        } else {
+            // Création d'un nouveau congé
+            conge = new Conge(numEmp, motifText, nbJr, dateDemande, dateRetour);
+            try {
+                conge.create(conge);
+            } catch (SQLException | ParseException ex) {
+                throw new RuntimeException(ex);
+            }
         }
 
         dispose();
@@ -134,5 +211,4 @@ public class CreateConge extends JDialog {
 
         return employes;
     }
-
 }

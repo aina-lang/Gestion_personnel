@@ -58,6 +58,15 @@ public class Conge {
         this.nbrjr = nbJr;
     }
 
+    public Conge(int congeId, int numEmp, String motifText, int nbJr, Date dateDemande, Date dateRetour) {
+        this.numConge = congeId;
+        this.numEmp = numEmp;
+        this.motif = motifText;
+        this.dateDemande = Date.valueOf(String.valueOf(dateDemande));
+        this.dateRetour = Date.valueOf(String.valueOf(dateRetour));
+        this.nbrjr = nbJr;
+    }
+
     public int getNbrjr() {
         return nbrjr;
     }
@@ -144,9 +153,19 @@ public class Conge {
     }
 
 
-    public void update(int numConge) {
-        // Implémenter la logique de mise à jour d'un congé en utilisant le numéro de congé fourni
+    public void update(Conge updatedConge) throws SQLException, ParseException {
+        String query = "UPDATE CONGE SET numEmp = ?, motif = ?, nbrjr = ?, dateDemande = ?, dateRetour = ? WHERE numConge = ?";
+        PreparedStatement statement = MySQLConnection.getConnection().prepareStatement(query);
+        statement.setInt(1, updatedConge.getNumEmp());
+        statement.setString(2, updatedConge.getMotif());
+        statement.setInt(3, updatedConge.getNbrjr());
+        statement.setDate(4, updatedConge.getDateDemande());
+        statement.setDate(5, updatedConge.getDateRetour());
+        statement.setInt(6, updatedConge.getNumConge());
+
+        statement.executeUpdate();
     }
+
 
     public void create(Conge conge) throws SQLException, ParseException {
         String query = "INSERT INTO CONGE (numEmp, motif , nbrjr, dateDemande, dateRetour) VALUES (?, ?, ?, ?, ?)";
