@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Employer {
@@ -164,4 +165,66 @@ public class Employer {
         }
         return employers;
     }
+
+
+    public List<Employer> getAbsentEmployeesForDate(Date date) throws SQLException {
+        List<Employer> employesAbsents = new ArrayList<>();
+        String query = "SELECT e.numEmp, e.Nom, e.Prenom FROM Employe e " +
+                "INNER JOIN Conge c ON e.numEmp = c.numEmp " +
+                "WHERE ? BETWEEN c.dateDemande AND c.dateRetour";
+
+        PreparedStatement statement = MySQLConnection.getConnection().prepareStatement(query);
+        statement.setDate(1, (java.sql.Date) date);
+
+        ResultSet resultSet = statement.executeQuery();
+
+        while (resultSet.next()) {
+            int numEmp = resultSet.getInt("numEmp");
+            String nom = resultSet.getString("Nom");
+            String prenom = resultSet.getString("Prenom");
+
+            Employer employe = new Employer(numEmp, nom, prenom);
+            employesAbsents.add(employe);
+        }
+
+        return employesAbsents;
+    }
+
+    public int getRemainingVacationDays(int numEmp) throws SQLException {
+        String query = "SELECT SUM(nbrJour) AS totalConges FROM Conge WHERE numEmp = ?";
+        PreparedStatement statement = MySQLConnection.getConnection().prepareStatement(query);
+        statement.setInt(1, numEmp);
+
+        ResultSet resultSet = statement.executeQuery();
+        if (resultSet.next()) {
+            int totalConges = resultSet.getInt("totalConges");
+            int remainingDays = 30 - totalConges; // Supposons que le nombre de congés par an est de 30 jours
+            return remainingDays >= 0 ? remainingDays : 0;
+        }
+
+        return 0;
+    }
+
+    public List<Employer> searchEmployees(String keyword) throws SQLException {
+        List<Employer> matchingEmployees = new ArrayList<>();
+        String query = "SELECT numEmp, Nom, Prenom FROM Employe WHERE Nom LIKE ? OR Prenom LIKE ?";
+        PreparedStatement statement = MySQLConnection.getConnection().prepareStatement(query);
+        statement.setString(1, "%" + keyword + "%");
+        statement.setString(2, "%" + keyword + "%");
+
+        ResultSet resultSet = statement.executeQuery();
+
+        while (resultSet.next()) {
+            int numEmp = resultSet.getInt("numEmp");
+            String nom = resultSet.getString("Nom");
+            String prenom = resultSet.getString("Prenom");
+
+            Employer employe = new Employer(numEmp, nom, prenom);
+            matchingEmployees.add(employe);
+        }
+
+        return matchingEmployees;
+    }
+
+
 }

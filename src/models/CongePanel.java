@@ -6,6 +6,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.sql.SQLException;
 
 public class CongePanel extends JPanel {
@@ -15,11 +16,11 @@ public class CongePanel extends JPanel {
     private JLabel titleLabel;
     private JButton addButton;
 
-    public CongePanel() {
+    public CongePanel() throws IOException {
         init();
     }
 
-    private void init() {
+    private void init() throws IOException {
         setLayout(new BorderLayout());
         setBorder(new EmptyBorder(10, 10, 10, 10)); // Ajoute un padding de 10 pixels autour du panneau
 

@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 
 public class Frame extends JFrame {
     private JPanel PrincipalLayout;
@@ -12,7 +13,7 @@ public class Frame extends JFrame {
     private JPanel sideBar;
     private JButton currentButton;
 
-    public Frame() {
+    public Frame() throws IOException {
         init();
         setContentPane(PrincipalLayout);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -25,7 +26,7 @@ public class Frame extends JFrame {
         pack();
     }
 
-    private void init() {
+    private void init() throws IOException {
 
 
         PrincipalLayout = new JPanel(new BorderLayout());
@@ -101,7 +102,11 @@ public class Frame extends JFrame {
                 }
                 currentButton = button;
                 currentButton.setBackground(new Color(0x3c7164));
-                setPanel(type);
+                try {
+                    setPanel(type);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
                 JPanel panel = null;
 
 
@@ -118,7 +123,7 @@ public class Frame extends JFrame {
         sideBar.add(Box.createVerticalStrut(verticalGap));
     }
 
-    private void setPanel(PanelType type) {
+    private void setPanel(PanelType type) throws IOException {
         JPanel panel = null;
         switch (type) {
             case DASHBOARD:

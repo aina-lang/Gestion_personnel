@@ -1,40 +1,67 @@
 package models;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
-import java.awt.event.ActionListener;
+import java.io.File;
 
 public class ButtonRenderer extends JPanel implements TableCellRenderer {
     private final JButton deleteButton;
     private final JButton editButton;
-
+    private final JButton readButton;
+    private final JButton generatePdfButton;
 
     public ButtonRenderer() {
         setOpaque(true);
+        setBorder(new EmptyBorder(10, 0, 0, 0));
 
-        deleteButton = new JButton("Supprimer");
-        deleteButton.setBackground(Color.RED);
-        deleteButton.setForeground(Color.WHITE);
+        setBackground(Color.WHITE);
+        deleteButton = new JButton();
+        deleteButton.setIcon(loadIcon("delete.png", 15));
+        // deleteButton.setBackground(null);
+        // deleteButton.setBorder(null);
 
-        editButton = new JButton("Modifier");
+        editButton = new JButton();
+        editButton.setIcon(loadIcon("edit.png", 15));
+        //editButton.setBackground(null);
+        // editButton.setBorder(null);
 
-        setLayout(new FlowLayout(FlowLayout.CENTER, 5, 0));
+        readButton = new JButton();
+        readButton.setIcon(loadIcon("book.png", 15));
+        // readButton.setBackground(null);
+        //readButton.setBorder(null);
+
+        generatePdfButton = new JButton();
+        generatePdfButton.setIcon(loadIcon("pdf.png", 15));
+        // generatePdfButton.setBackground(null);
+        // generatePdfButton.setBorder(null);
+
         add(deleteButton);
         add(editButton);
+        add(readButton);
+        add(generatePdfButton);
+
     }
 
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         return this;
     }
 
-    public void addActionListenerToDeleteButton(ActionListener listener) {
-        deleteButton.addActionListener(listener);
-    }
+    private ImageIcon loadIcon(String fileName, int size) {
+        String filePath = "resources/" + fileName;
+        File imageFile = new File(filePath);
+        String imagePath = imageFile.getAbsolutePath();
 
-    public void addActionListenerToEditButton(ActionListener listener) {
-        editButton.addActionListener(listener);
+        System.out.println(imagePath);
+        ImageIcon icon = new ImageIcon(imagePath);
+        if (icon != null && icon.getImageLoadStatus() == MediaTracker.COMPLETE) {
+            Image image = icon.getImage();
+            Image scaledImage = image.getScaledInstance(size, size, Image.SCALE_SMOOTH);
+            return new ImageIcon(scaledImage);
+        } else {
+            System.err.println("Failed to load icon: " + filePath);
+            return null;
+        }
     }
 }
-
-

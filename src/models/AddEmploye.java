@@ -23,7 +23,7 @@ public class AddEmploye extends JDialog {
     private Employer employe;
     private int numEmp = -1;
 
-    public AddEmploye() {
+    public AddEmploye(EmployerPanel employerPanel) {
         init();
     }
 

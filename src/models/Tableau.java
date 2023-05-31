@@ -3,6 +3,7 @@ package models;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+import java.io.IOException;
 import java.util.List;
 
 public class Tableau extends JTable {
@@ -14,7 +15,7 @@ public class Tableau extends JTable {
     public Tableau() {
     }
 
-    public Tableau(Object model, String[] columnNames, DefaultTableModel dm, int nbColumns) {
+    public Tableau(Object model, String[] columnNames, DefaultTableModel dm, int nbColumns) throws IOException {
         this.model = dm;
         this.columnNames = columnNames;
         this.objectModel = model;
