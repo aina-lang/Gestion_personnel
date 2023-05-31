@@ -1,5 +1,10 @@
 package models;
 
+import com.raven.datechooser.DateChooser;
+import com.raven.datechooser.EventDateChooser;
+import com.raven.datechooser.SelectedAction;
+import com.raven.datechooser.SelectedDate;
+
 import javax.swing.*;
 import java.awt.event.*;
 import java.sql.Date;
@@ -7,6 +12,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +29,10 @@ public class CreateConge extends JDialog {
     private JTextField jourRetour;
     private JTextField moisRetour;
     private JTextField anneeRetour;
+    private JButton dateDemandeBtn;
+    private JButton dateRetourBtn;
+    private JTextField textField1;
+
     private JSpinner nbrJour;
     private Conge conge;
     private final MySQLConnection cnx = new MySQLConnection();
@@ -60,14 +71,18 @@ public class CreateConge extends JDialog {
                 onCancel();
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
         // Utilisez les paramètres pour pré-remplir les champs du formulaire
-        this.jourDemande.setText(Integer.toString(dateDemande.getDay()));
-        this.moisDemande.setText(Integer.toString(dateDemande.getMonth()));
-        this.anneeDemande.setText(Integer.toString(dateDemande.getYear() + 1900));
+        LocalDate localDateDemande = dateDemande.toLocalDate();
+        LocalDate localDateRetour = dateRetour.toLocalDate();
+
+        this.jourDemande.setText(String.valueOf(localDateDemande.getDayOfMonth()));
+        this.moisDemande.setText(String.valueOf(localDateDemande.getMonthValue()));
+        this.anneeDemande.setText(String.valueOf(localDateDemande.getYear()));
         this.motif.setText(motif);
-        this.jourRetour.setText(Integer.toString(dateRetour.getDay()));
-        this.moisRetour.setText(Integer.toString(dateRetour.getMonth()));
-        this.anneeRetour.setText(Integer.toString(dateRetour.getYear() + 1900));
+        this.jourRetour.setText(String.valueOf(localDateRetour.getDayOfMonth()));
+        this.moisRetour.setText(String.valueOf(localDateRetour.getMonthValue()));
+        this.anneeRetour.setText(String.valueOf(localDateRetour.getYear()));
         this.nbrJour.setValue(nbrJours);
         this.employe.setSelectedItem(numEmp + " - " + getEmployeName(numEmp));
     }
@@ -110,6 +125,39 @@ public class CreateConge extends JDialog {
 
     public CreateConge() throws SQLException {
         this(0);
+        dateDemandeBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DateChooser dateChooser1 = new DateChooser();
+                dateChooser1.setTextRefernce(textField1);
+
+                dateChooser1.showPopup();
+                dateChooser1.addEventDateChooser(new EventDateChooser() {
+                    @Override
+                    public void dateSelected(SelectedAction selectedAction, SelectedDate selectedDate) {
+                        jourDemande.setText(String.valueOf(selectedDate.getDay()));
+                        moisDemande.setText(String.valueOf(selectedDate.getMonth()));
+                        anneeDemande.setText(String.valueOf(selectedDate.getYear()));
+                    }
+                });
+            }
+        });
+        dateRetourBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DateChooser dateChooser2 = new DateChooser();
+                dateChooser2.setTextRefernce(textField1);
+                dateChooser2.showPopup();
+                dateChooser2.addEventDateChooser(new EventDateChooser() {
+                    @Override
+                    public void dateSelected(SelectedAction selectedAction, SelectedDate selectedDate) {
+                        jourRetour.setText(String.valueOf(selectedDate.getDay()));
+                        moisRetour.setText(String.valueOf(selectedDate.getMonth()));
+                        anneeRetour.setText(String.valueOf(selectedDate.getYear()));
+                    }
+                });
+            }
+        });
     }
 
     public String getEmployeName(int numEmp) throws SQLException {
@@ -135,12 +183,11 @@ public class CreateConge extends JDialog {
         String jourRetourText = jourRetour.getText();
         String moisRetourText = moisRetour.getText();
         String anneeRetourText = anneeRetour.getText();
-        int nbJr = (int) this.nbrJour.getValue();
+
         String employeText = (String) employe.getSelectedItem();
         String selectedEmploye = (String) employe.getSelectedItem();
         String[] parts = selectedEmploye.split(" - ");
         int numEmp = Integer.parseInt(parts[0]);
-
 
         // Vérifier si tous les champs sont remplis
         if (jourDemandeText.isEmpty() || moisDemandeText.isEmpty() || anneeDemandeText.isEmpty() ||
@@ -158,29 +205,81 @@ public class CreateConge extends JDialog {
         int moisRetour = Integer.parseInt(moisRetourText);
         int anneeRetour = Integer.parseInt(anneeRetourText);
 
+
+        // Vérifier si la date de demande est supérieure à la date d'aujourd'hui
+        LocalDate dateDemande = LocalDate.of(anneeDemande, moisDemande, jourDemande);
+        LocalDate currentDate = LocalDate.now();
+        if (!dateDemande.isAfter(currentDate)) {
+            JOptionPane.showMessageDialog(contentPane, "La date de demande doit être supérieure à la date d'aujourd'hui.", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Vérifier si la date de retour est supérieure à la date de demande
+        LocalDate dateRetour = LocalDate.of(anneeRetour, moisRetour, jourRetour);
+        if (!dateRetour.isAfter(dateDemande)) {
+            JOptionPane.showMessageDialog(contentPane, "La date de retour doit être supérieure à la date de demande.", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+
         // Créer les objets Date pour dateDemande et dateRetour
-        Date dateDemande = new Date(anneeDemande - 1900, moisDemande - 1, jourDemande);
-        Date dateRetour = new Date(anneeRetour - 1900, moisRetour - 1, jourRetour);
+        Date dateD = new Date(anneeDemande - 1900, moisDemande - 1, jourDemande);
+        Date dateR = new Date(anneeRetour - 1900, moisRetour - 1, jourRetour);
+
+        String temp = dateD.toString();
+        String[] part = temp.split("-");
+        // LocalDate dateDemande = LocalDate.of(Integer.parseInt(part[0]), Integer.parseInt(part[1]), Integer.parseInt(part[2]));
+
+        temp = dateR.toString();
+        String[] part1 = temp.split("-");
+        // LocalDate dateRetour = LocalDate.of(Integer.parseInt(part1[0]), Integer.parseInt(part1[1]), Integer.parseInt(part1[2]));
+
+        // Calculer le nombre de jours entre dateDemande et dateRetour
+        long nbJr = ChronoUnit.DAYS.between(dateDemande, dateRetour);
+
+        // Vérifier si le nombre de jours de congé dépasse 30
+        if (nbJr > 30) {
+            JOptionPane.showMessageDialog(contentPane, "Le nombre de jours de congé ne doit pas dépasser 30 jours.", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        int nbCongesPris = 0;
+
+        try {
+            nbCongesPris = getNbCongesPris(numEmp);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        if (nbCongesPris >= 30) {
+            JOptionPane.showMessageDialog(contentPane, "L'employé a déjà pris 30 congés cette année.", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
         // Créer l'objet Conge
         if (congeId > 0) {
             // Modification du congé existant
-            conge = new Conge(congeId, numEmp, motifText, nbJr, dateDemande, dateRetour);
+            conge = new Conge(congeId, numEmp, motifText, Math.toIntExact(nbJr), dateD, dateR);
             try {
                 conge.update(conge);
-                System.out.println("Congé mis à jour avec succès !");
+                dispose();
+                JOptionPane.showMessageDialog(contentPane, "Mise a jours du demande de congé effectueé.", "Effectuée", JOptionPane.PLAIN_MESSAGE);
             } catch (SQLException | ParseException ex) {
                 throw new RuntimeException(ex);
             }
         } else {
             // Création d'un nouveau congé
-            conge = new Conge(numEmp, motifText, nbJr, dateDemande, dateRetour);
+            conge = new Conge(numEmp, motifText, Math.toIntExact(nbJr), dateD, dateR);
             try {
                 conge.create(conge);
+                dispose();
+                JOptionPane.showMessageDialog(contentPane, "Demande du congé effectueé.", "Effectuée", JOptionPane.ERROR_MESSAGE);
+
             } catch (SQLException | ParseException ex) {
                 throw new RuntimeException(ex);
             }
         }
+
 
         dispose();
     }
@@ -211,4 +310,22 @@ public class CreateConge extends JDialog {
 
         return employes;
     }
+
+
+    private int getNbCongesPris(int numEmp) throws SQLException {
+        String query = "SELECT nbrjr  FROM CONGE WHERE numEmp = " + numEmp + " AND YEAR(dateDemande) = YEAR(CURRENT_DATE)";
+        Statement statement = MySQLConnection.getConnection().createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+        int nbConges = 0;
+        while (resultSet.next()) {
+            nbConges = nbConges + resultSet.getInt("nbrjr");
+            System.out.println("nombre du conge pris par est de " + resultSet.getInt("nbrjr"));
+        }
+        resultSet.close();
+        statement.close();
+        System.out.println("nombre du conge pris par est de " + nbConges);
+        return nbConges;
+    }
+
+
 }

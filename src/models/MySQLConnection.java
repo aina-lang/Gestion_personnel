@@ -22,7 +22,7 @@ public class MySQLConnection {
         }
     }
 
-    static Connection getConnection() {
+    public static Connection getConnection() {
         return connection;
     }
 
@@ -49,10 +49,11 @@ public class MySQLConnection {
 
             // Requête pour créer la table "POINTAGE" si elle n'existe pas
             String createPointageTableQuery = "CREATE TABLE IF NOT EXISTS POINTAGE ("
-                    + "datePointage DATETIME,"
+                    + "id INT AUTO_INCREMENT PRIMARY KEY,"
+                    + " datePointage DATETIME,"
                     + "numEmp INT,"
                     + "pointage VARCHAR(255),"
-                    + "FOREIGN KEY (numEmp) REFERENCES EMPLOYE(numEmp)"
+                    + "FOREIGN KEY (numEmp) REFERENCES EMPLOYE(numEmp) ON DELETE CASCADE"
                     + ")";
             statement.executeUpdate(createPointageTableQuery);
 
@@ -64,7 +65,7 @@ public class MySQLConnection {
                     + "nbrjr INT,"
                     + "dateDemande DATE,"
                     + "dateRetour DATE,"
-                    + "FOREIGN KEY (numEmp) REFERENCES EMPLOYE(numEmp)"
+                    + "FOREIGN KEY (numEmp) REFERENCES EMPLOYE(numEmp) ON DELETE CASCADE"
                     + ")";
             statement.executeUpdate(createCongeTableQuery);
 

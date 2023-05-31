@@ -142,7 +142,7 @@ public class AddEmploye extends JDialog {
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-        nom.addKeyListener(new KeyAdapter() {
+       /* nom.addKeyListener(new KeyAdapter() {
             final Pattern pattern = Pattern.compile("[^a-zA-Z\\s]");
 
             @Override
@@ -168,7 +168,7 @@ public class AddEmploye extends JDialog {
             }
         });
 
-
+*/
     }
 
 
@@ -221,7 +221,7 @@ public class AddEmploye extends JDialog {
         });
 
         poste.addKeyListener(new KeyAdapter() {
-            final Pattern pattern = Pattern.compile("[^a-zA-Z\\s]");
+            final Pattern pattern = Pattern.compile("[^a-zA-Z]");
 
             @Override
             public void keyTyped(KeyEvent e) {

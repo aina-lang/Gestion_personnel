@@ -13,10 +13,11 @@ public class ButtonRenderer extends JPanel implements TableCellRenderer {
     private final JButton generatePdfButton;
 
     public ButtonRenderer() {
-        setOpaque(true);
+        //setOpaque(true);
         setBorder(new EmptyBorder(10, 0, 0, 0));
 
-        setBackground(Color.WHITE);
+        setOpaque(false);
+
         deleteButton = new JButton();
         deleteButton.setIcon(loadIcon("delete.png", 15));
         // deleteButton.setBackground(null);
@@ -53,7 +54,6 @@ public class ButtonRenderer extends JPanel implements TableCellRenderer {
         File imageFile = new File(filePath);
         String imagePath = imageFile.getAbsolutePath();
 
-        System.out.println(imagePath);
         ImageIcon icon = new ImageIcon(imagePath);
         if (icon != null && icon.getImageLoadStatus() == MediaTracker.COMPLETE) {
             Image image = icon.getImage();

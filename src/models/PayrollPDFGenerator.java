@@ -8,6 +8,7 @@ import com.itextpdf.layout.element.Text;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.File;
 import java.io.FileNotFoundException;
 
 public class PayrollPDFGenerator {
@@ -15,6 +16,7 @@ public class PayrollPDFGenerator {
         // Demander à l'utilisateur de spécifier l'emplacement du fichier de sortie
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Sélectionner l'emplacement de sortie");
+        fileChooser.setSelectedFile(new File(employeeName + "Pdf"));
         fileChooser.setFileFilter(new FileNameExtensionFilter("Fichiers PDF (*.pdf)", "pdf"));
 
         int userSelection = fileChooser.showSaveDialog(null);
@@ -44,7 +46,7 @@ public class PayrollPDFGenerator {
                 // Fermer le document
                 document.close();
 
-                System.out.println("Fiche de paie générée avec succès!");
+                JOptionPane.showMessageDialog(null, "Fiche de paie générée avec succès!");
 
             } catch (FileNotFoundException e) {
                 e.printStackTrace();

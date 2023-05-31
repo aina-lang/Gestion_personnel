@@ -16,11 +16,11 @@ public class CongePanel extends JPanel {
     private JLabel titleLabel;
     private JButton addButton;
 
-    public CongePanel() throws IOException {
+    public CongePanel() throws IOException, SQLException, NoSuchMethodException {
         init();
     }
 
-    private void init() throws IOException {
+    private void init() throws IOException, SQLException, NoSuchMethodException {
         setLayout(new BorderLayout());
         setBorder(new EmptyBorder(10, 10, 10, 10)); // Ajoute un padding de 10 pixels autour du panneau
 
@@ -47,10 +47,10 @@ public class CongePanel extends JPanel {
         // models.Tableau
         String[] columnNames = {"Numero", "Numero employe", "Nombres de Jours", "Motif", "Date du demande", "Date du retour", "Action"};
         model = new DefaultTableModel(columnNames, 0);
-        int numConge;
         table = new Tableau(new Conge(), columnNames, model, 6);
-        table.refreshTable(table);
-
+        // Rafraîchir la table avec les congés
+        /*table.refreshTable(new Conge(), Conge.class.getMethod("lister"), table);
+         */
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(new EmptyBorder(30, 10, 30, 10));
@@ -77,7 +77,14 @@ public class CongePanel extends JPanel {
                 dialog.setResizable(false);
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
-                table.refreshTable(table);
+
+                String[] method = {"motif", "numEmp"};
+                try {
+                    table.refreshTable(new Conge(), "lister", method, table);
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+
             }
         });
 

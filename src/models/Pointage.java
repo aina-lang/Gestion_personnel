@@ -66,9 +66,10 @@ public class Pointage {
         return pointages;
     }
 
-    public int getId() {
+    public int getID() {
         return id;
     }
+
 
     public String getDatePointage() {
         return datePointage;
@@ -78,11 +79,12 @@ public class Pointage {
         this.datePointage = datePointage;
     }
 
-    public int getNumEmp() {
+
+    public int getNumero() {
         return numEmp;
     }
 
-    public void setNumEmp(int numEmp) {
+    public void setNumero(int numEmp) {
         this.numEmp = numEmp;
     }
 

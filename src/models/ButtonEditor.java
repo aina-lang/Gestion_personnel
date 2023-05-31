@@ -25,7 +25,7 @@ public class ButtonEditor extends DefaultCellEditor {
 
         super(new JTextField());
         panel = new JPanel();
-        panel.setBackground(Color.white);
+        panel.setOpaque(false);
         panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 0));
         panel.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.setAlignmentY(Component.CENTER_ALIGNMENT);
@@ -80,6 +80,7 @@ public class ButtonEditor extends DefaultCellEditor {
                             if (option == JOptionPane.YES_OPTION) {
                                 Employer temp = new Employer();
                                 temp.deleteEmp(numEmp);
+                                JOptionPane.showMessageDialog(null, "Employer supprimé avec succès!");
                             }
                         } else if (tableName.equals("Pointage")) {
                             int pointageId = (int) table.getValueAt(selectedRow, 0);
@@ -94,6 +95,7 @@ public class ButtonEditor extends DefaultCellEditor {
                             if (option == JOptionPane.YES_OPTION) {
                                 Pointage temp = new Pointage();
                                 temp.deletePointage(pointageId);
+                                JOptionPane.showMessageDialog(null, "Pointage supprimer avec succès!");
                             }
                         } else if (tableName.equals("Conge")) {
                             int congeId = (int) table.getValueAt(selectedRow, 0);
@@ -108,6 +110,8 @@ public class ButtonEditor extends DefaultCellEditor {
                             if (option == JOptionPane.YES_OPTION) {
                                 Conge temp = new Conge();
                                 temp.delete(congeId);
+                                MessageBox msg = new MessageBox("Conge supprimer avec succès!", "conge n1", "Supression effectue");
+                                JOptionPane.showMessageDialog(null, "Conge supprimer avec succès!");
                             }
                         }
 
@@ -344,14 +348,8 @@ public class ButtonEditor extends DefaultCellEditor {
                         String poste = (String) table.getValueAt(selectedRow, 3);
                         Float salaire = (Float) table.getValueAt(selectedRow, 4);
 
-                        // Créer un JPanel pour le formulaire d'édition d'employé (updateEmploy.form)
-                        System.out.println(numEmp);
-
-                        AddEmploye dialog = new AddEmploye(numEmp, nom, prenom, poste, salaire);
-                        dialog.pack();
-                        dialog.setResizable(false);
-                        dialog.setLocationRelativeTo(null);
-                        dialog.setVisible(true);
+                        PayrollPDFGenerator pdf = new PayrollPDFGenerator();
+                        pdf.generatePayrollPDF(nom, "mai", 5000);
                     }
                 } else if (tableName.equals("Pointage")) {
                     // Logique de modification pour la table "Pointage"
@@ -467,9 +465,9 @@ public class ButtonEditor extends DefaultCellEditor {
             model.setRowCount(0);
             for (Pointage pointage : pointages) {
                 Object[] rowData = {
-                        pointage.getId(),
+                        pointage.getID(),
                         pointage.getDatePointage(),
-                        pointage.getNumEmp(),
+                        pointage.getNumero(),
                         pointage.getPointage(),
                         "Action"
                 };
@@ -503,14 +501,14 @@ public class ButtonEditor extends DefaultCellEditor {
         File imageFile = new File(filePath);
         String imagePath = imageFile.getAbsolutePath();
 
-        System.out.println(imagePath);
+        //System.out.println(imagePath);
         ImageIcon icon = new ImageIcon(imagePath);
         if (icon != null && icon.getImageLoadStatus() == MediaTracker.COMPLETE) {
             Image image = icon.getImage();
             Image scaledImage = image.getScaledInstance(size, size, Image.SCALE_SMOOTH);
             return new ImageIcon(scaledImage);
         } else {
-            System.err.println("Failed to load icon: " + filePath);
+            //System.err.println("Failed to load icon: " + filePath);
             return null;
         }
 

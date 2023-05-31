@@ -113,6 +113,7 @@
               <maximumSize width="300" height="40"/>
               <minimumSize width="280" height="40"/>
               <preferredSize width="280" height="40"/>
+              <text value=""/>
             </properties>
           </component>
           <component id="f2122" class="javax.swing.JLabel" binding="nomMsg">
@@ -121,7 +122,7 @@
               <forms/>
             </constraints>
             <properties>
-              <text value="Label"/>
+              <text value=""/>
             </properties>
           </component>
           <component id="63c1" class="javax.swing.JLabel" binding="prenomMsg">
@@ -130,7 +131,7 @@
               <forms/>
             </constraints>
             <properties>
-              <text value="Label"/>
+              <text value=""/>
             </properties>
           </component>
           <component id="4c86a" class="javax.swing.JLabel" binding="posteMsg">
@@ -139,7 +140,7 @@
               <forms/>
             </constraints>
             <properties>
-              <text value="Label"/>
+              <text value=""/>
             </properties>
           </component>
           <component id="f58fe" class="javax.swing.JLabel">
@@ -173,7 +174,7 @@
               <forms/>
             </constraints>
             <properties>
-              <text value="Label"/>
+              <text value=""/>
             </properties>
           </component>
         </children>

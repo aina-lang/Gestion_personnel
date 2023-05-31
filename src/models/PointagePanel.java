@@ -16,11 +16,11 @@ public class PointagePanel extends JPanel {
     private JLabel titleLabel;
     private JButton addButton;
 
-    public PointagePanel() throws IOException {
+    public PointagePanel() throws IOException, SQLException, NoSuchMethodException {
         init();
     }
 
-    private void init() throws IOException {
+    private void init() throws IOException, SQLException, NoSuchMethodException {
         setLayout(new BorderLayout());
         setBorder(new EmptyBorder(10, 10, 10, 10)); // Ajoute un padding de 10 pixels autour du panneau
 
@@ -45,10 +45,14 @@ public class PointagePanel extends JPanel {
         add(headerContainer, BorderLayout.NORTH);
 
         // Tableau
-        String[] columnNames = {"ID", "Date de pointage", "Numéro employé", "Pointage", "Action"};
+        String[] columnNames = {"ID", "Date de pointage", "Numero employe", "Pointage", "Action"};
+        String[] methode = {"id", "datePointage", "numEmp", "Pointage"};
         model = new DefaultTableModel(columnNames, 0);
         table = new Tableau(new Pointage(), columnNames, model, 4);
-        table.refreshTable(table);
+        // Rafraîchir la table avec les pointages
+        String listMethod = "listerPointage";
+        table.refreshTable(new Pointage(), listMethod, methode, table);
+
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(new EmptyBorder(30, 10, 30, 10));
@@ -75,7 +79,13 @@ public class PointagePanel extends JPanel {
                 dialog.setResizable(false);
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
-                table.refreshTable(table);
+
+                try {
+                    table.refreshTable(new Pointage(), "listerPointage", methode, table);
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+
             }
         });
 
